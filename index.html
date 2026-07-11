@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📈 실시간 주도 테마 & 진성 대장주 내비게이션</title>
+<style>
+  :root {
+    --navy: #1F3A5F; --navy-light: #2E4E7A; --gold: #C9A227;
+    --up: #D64541; --down: #2E6DA4; --bg: #F7F8FA; --card: #FFFFFF;
+    --border: #E3E7ED; --text: #24292F; --muted: #6B7280;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; background: var(--bg); color: var(--text); }
+  header { background: var(--navy); color: #fff; padding: 18px 24px; }
+  header h1 { font-size: 20px; }
+  header h1 .gold { color: var(--gold); }
+  header .sub { font-size: 12px; opacity: .8; margin-top: 4px; }
+  .updated { font-size: 12px; color: var(--gold); margin-top: 6px; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px; }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+  .card h2 { font-size: 15px; color: var(--navy); border-left: 4px solid var(--gold); padding-left: 8px; margin-bottom: 12px; }
+  /* 테마 TOP10 바 */
+  .bar-row { display: flex; align-items: center; margin: 5px 0; font-size: 13px; cursor: pointer; }
+  .bar-row:hover .bar-name { text-decoration: underline; }
+  .bar-name { width: 150px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { flex: 1; background: #EDF0F4; border-radius: 4px; height: 20px; position: relative; }
+  .bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--navy-light), var(--up)); }
+  .bar-val { position: absolute; right: 6px; top: 0; line-height: 20px; font-size: 12px; font-weight: bold; }
+  .persist-tag { font-size: 11px; margin-left: 6px; }
+  .summary { font-size: 12px; color: var(--muted); margin-top: 10px; }
+  select, input[type=number] { padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; width: 100%; }
+  label { font-size: 12px; color: var(--muted); display: block; margin: 8px 0 4px; }
+  /* 대장주 카드 */
+  .leader-box { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+  .metric { background: #F4F6FA; border-radius: 8px; padding: 12px; text-align: center; }
+  .metric .k { font-size: 11px; color: var(--muted); }
+  .metric .v { font-size: 18px; font-weight: bold; color: var(--navy); margin-top: 4px; }
+  .metric .v.up { color: var(--up); }
+  .badge { display: inline-block; font-size: 12px; padding: 4px 10px; border-radius: 12px; margin-bottom: 8px; }
+  .badge.ok { background: #E8F5E9; color: #1B7A3D; }
+  .badge.warn { background: #FDF3E0; color: #A66B00; }
+  .second { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  /* 종목 테이블 */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+  th { background: var(--navy); color: #fff; padding: 8px 6px; font-weight: normal; font-size: 12px; cursor: pointer; user-select: none; }
+  th:hover { background: var(--navy-light); }
+  td { padding: 7px 6px; border-bottom: 1px solid var(--border); text-align: right; }
+  td:first-child, th:first-child { text-align: left; }
+  tr:hover td { background: #F4F6FA; }
+  .rate-up { color: var(--up); font-weight: bold; }
+  .rate-down { color: var(--down); font-weight: bold; }
+  a.chart-link { color: var(--navy); text-decoration: none; font-size: 12px; }
+  a.chart-link:hover { color: var(--gold); }
+  footer { text-align: center; font-size: 11px; color: var(--muted); padding: 20px; line-height: 1.7; }
+  .loading { text-align: center; padding: 60px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>📈 실시간 주도 테마 & <span class="gold">진성 대장주</span> 내비게이션</h1>
+  <div class="sub">거래대금이 받쳐주는 진성 대장주와 테마 지속성(연속 주도 vs 신규 점화)을 함께 포착합니다</div>
+  <div class="updated" id="updated">데이터 불러오는 중...</div>
+</header>
+
+<div class="wrap" id="app" style="display:none">
+  <div>
+    <div class="card">
+      <h2>🔥 오늘 최고의 주도 테마 TOP 10</h2>
+      <div id="top10"></div>
+      <div class="summary" id="rotation"></div>
+    </div>
+    <div class="card">
+      <h2>테마 상세 선택</h2>
+      <label>상세 분석할 테마 (상위 <span id="topN">15</span>개 테마 제공)</label>
+      <select id="themeSel"></select>
+      <label>진성 대장주 거래대금 기준 (억 원)</label>
+      <input type="number" id="threshold" value="100" min="10" step="10">
+    </div>
+  </div>
+  <div>
+    <div class="card">
+      <h2 id="detailTitle">🔍 테마 상세 분석</h2>
+      <div id="themeMeta" class="summary"></div>
+      <div id="leaderArea"></div>
+    </div>
+    <div class="card">
+      <h2>📊 테마 소속 종목 전체 보기 <span style="font-size:11px;color:var(--muted)">(컬럼 클릭 시 정렬)</span></h2>
+      <div style="overflow-x:auto"><table id="stockTable">
+        <thead><tr>
+          <th data-k="name">종목명</th><th data-k="price">현재가</th>
+          <th data-k="rate">등락률</th><th data-k="vol">거래량</th>
+          <th data-k="amt">거래대금(억)</th><th>차트</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<div class="loading" id="loading">데이터를 불러오는 중입니다...</div>
+
+<footer>
+  데이터: 네이버 증권 지연 시세 기준 · 장중 약 3분 간격 자동 갱신<br>
+  ⚠️ 본 페이지는 개인 투자 참고용 정보 제공 목적이며, 투자 권유가 아닙니다. 투자 판단의 책임은 이용자 본인에게 있습니다.
+</footer>
+
+<script>
+let DATA = null;
+let sortKey = 'rate', sortDesc = true;
+
+const fmt = n => n.toLocaleString('ko-KR', {maximumFractionDigits: 0});
+const fmtRate = r => (r > 0 ? '+' : '') + r.toFixed(2) + '%';
+const rateCls = r => r > 0 ? 'rate-up' : (r < 0 ? 'rate-down' : '');
+const persistIcon = p => p === '연속 주도' ? '🔥' : (p === '신규 점화' ? '⚡' : '❄️');
+
+const DATA_URL = 'https://raw.githubusercontent.com/jeon0jini82-ops/theme-dashboard/data/data.json';  // setup_github.py 실행 시 자동으로 GitHub 주소로 교체됨
+
+async function load() {
+  try {
+    const sep = DATA_URL.includes('?') ? '&' : '?';
+    const res = await fetch(DATA_URL + sep + 't=' + Date.now());
+    DATA = await res.json();
+    render();
+  } catch (e) {
+    document.getElementById('loading').textContent = '데이터를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.';
+  }
+}
+
+function render() {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'grid';
+  document.getElementById('updated').textContent = '마지막 갱신: ' + DATA.updated;
+  document.getElementById('topN').textContent = DATA.detail_top_n;
+
+  // TOP10 바 차트
+  const top10 = DATA.themes.slice(0, 10);
+  const maxRate = Math.max(...top10.map(t => t.rate), 0.01);
+  document.getElementById('top10').innerHTML = top10.map(t =>
+    `<div class="bar-row" onclick="selectTheme('${t.id}')">
+      <div class="bar-name">${persistIcon(t.persist)} ${t.name}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(t.rate / maxRate * 100, 3)}%"></div>
+        <span class="bar-val">${fmtRate(t.rate)}</span></div>
+    </div>`).join('');
+
+  // 로테이션 요약
+  const cont = DATA.themes.filter(t => t.persist === '연속 주도').length;
+  const fresh = DATA.themes.filter(t => t.persist === '신규 점화').length;
+  document.getElementById('rotation').textContent =
+    `🔥 연속 주도 ${cont}개 · ⚡ 신규 점화 ${fresh}개 ` +
+    (cont >= fresh ? '→ 주도 테마 유지 국면' : '→ 로테이션 빠른 국면 (짧은 호흡 대응)');
+
+  // 테마 선택 드롭다운 (상세 데이터 있는 테마만)
+  const sel = document.getElementById('themeSel');
+  const withDetail = DATA.themes.filter(t => DATA.details[t.id] && DATA.details[t.id].length);
+  sel.innerHTML = withDetail.map(t =>
+    `<option value="${t.id}">${t.name} (${fmtRate(t.rate)})</option>`).join('');
+  sel.onchange = renderDetail;
+  document.getElementById('threshold').oninput = renderDetail;
+  renderDetail();
+}
+
+function selectTheme(id) {
+  const sel = document.getElementById('themeSel');
+  if ([...sel.options].some(o => o.value === id)) { sel.value = id; renderDetail(); }
+}
+
+function renderDetail() {
+  const id = document.getElementById('themeSel').value;
+  const theme = DATA.themes.find(t => t.id === id);
+  const stocks = (DATA.details[id] || []).slice();
+  if (!theme || !stocks.length) return;
+
+  document.getElementById('detailTitle').textContent = `🔍 '${theme.name}' 상세 분석`;
+  document.getElementById('themeMeta').textContent =
+    `테마 등락률 ${fmtRate(theme.rate)} · 3일 평균 ${fmtRate(theme.avg3)} · ${persistIcon(theme.persist)} ${theme.persist}`;
+
+  // 대장주 선정 (거래대금 기준: 억 → 백만 환산)
+  const thB = parseFloat(document.getElementById('threshold').value) || 100;
+  const thM = thB * 100;
+  let pool = stocks.filter(s => s.amt >= thM);
+  const fallback = pool.length === 0;
+  if (fallback) pool = stocks;
+  const ranked = pool.slice().sort((a, b) => b.rate - a.rate);
+  const L = ranked[0];
+
+  let html = fallback
+    ? `<div class="badge warn">⚠️ 거래대금 ${thB}억 이상 종목 없음 → 등락률 1위 표시 (신뢰도 낮음)</div>`
+    : `<div class="badge ok">✅ 거래대금 ${thB}억 이상 충족 — 수급이 확인된 대장주</div>`;
+  html += `<div class="leader-box">
+    <div class="metric"><div class="k">👑 대장 종목</div><div class="v">${L.name}</div></div>
+    <div class="metric"><div class="k">등락률</div><div class="v ${L.rate>0?'up':''}">${fmtRate(L.rate)}</div></div>
+    <div class="metric"><div class="k">거래대금</div><div class="v">${fmt(L.amt/100)} 억</div></div>
+  </div>`;
+  if (ranked.length >= 2) {
+    const S = ranked[1];
+    html += `<div class="second">🥈 2등주: <b>${S.name}</b> (${fmtRate(S.rate)} / ${fmt(S.amt/100)}억) — 대장주와 격차 ${(L.rate-S.rate).toFixed(2)}%p</div>`;
+  }
+  document.getElementById('leaderArea').innerHTML = html;
+  renderTable(stocks);
+}
+
+function renderTable(stocks) {
+  stocks.sort((a, b) => sortDesc
+    ? (typeof b[sortKey] === 'string' ? b[sortKey].localeCompare(a[sortKey]) : b[sortKey] - a[sortKey])
+    : (typeof a[sortKey] === 'string' ? a[sortKey].localeCompare(b[sortKey]) : a[sortKey] - b[sortKey]));
+  document.querySelector('#stockTable tbody').innerHTML = stocks.map(s =>
+    `<tr><td>${s.name}</td><td>${fmt(s.price)}원</td>
+     <td class="${rateCls(s.rate)}">${fmtRate(s.rate)}</td>
+     <td>${fmt(s.vol)}</td><td>${fmt(s.amt/100)}</td>
+     <td><a class="chart-link" target="_blank" rel="noopener"
+        href="https://finance.naver.com/item/fchart.naver?code=${s.code}">📈 보기</a></td></tr>`).join('');
+}
+
+document.querySelectorAll('#stockTable th[data-k]').forEach(th => {
+  th.onclick = () => {
+    const k = th.dataset.k;
+    if (sortKey === k) sortDesc = !sortDesc; else { sortKey = k; sortDesc = true; }
+    const id = document.getElementById('themeSel').value;
+    renderTable((DATA.details[id] || []).slice());
+  };
+});
+
+load();
+setInterval(load, 60_000);  // 1분마다 최신 data.json 확인
+</script>
+</body>
+</html>
