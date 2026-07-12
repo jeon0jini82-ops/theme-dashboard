@@ -3,90 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📈 실시간 주도 테마 & 진성 대장주 내비게이션</title>
+<title>테마 내비게이션 — 실시간 주도 테마 &amp; 진성 대장주</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
 <style>
+  /* ── Coinbase Design System (DESIGN.md) ─────────────────
+     CoinbaseDisplay/Sans → Inter, CoinbaseMono → JetBrains Mono (문서 명시 대체 폰트) */
   :root {
-    --navy: #1F3A5F; --navy-light: #2E4E7A; --gold: #C9A227;
-    --up: #D64541; --down: #2E6DA4; --bg: #F7F8FA; --card: #FFFFFF;
-    --border: #E3E7ED; --text: #24292F; --muted: #6B7280;
+    --primary: #0052ff; --primary-active: #003ecc; --primary-disabled: #a8b8cc;
+    --ink: #0a0b0d; --body: #5b616e; --muted: #7c828a; --muted-soft: #a8acb3;
+    --hairline: #dee1e6; --hairline-soft: #eef0f3;
+    --canvas: #ffffff; --surface-soft: #f7f7f7; --surface-strong: #eef0f3;
+    --surface-dark: #0a0b0d; --surface-dark-elevated: #16181c;
+    --on-primary: #ffffff; --on-dark: #ffffff; --on-dark-soft: #a8acb3;
+    --up: #05b169; --down: #cf202f;
+    --r-md: 12px; --r-lg: 16px; --r-xl: 24px; --r-pill: 100px;
+    --sans: 'Inter', -apple-system, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --mono: 'JetBrains Mono', 'Coinbase Mono', monospace;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; background: var(--bg); color: var(--text); }
-  header { background: var(--navy); color: #fff; padding: 18px 24px; }
-  header h1 { font-size: 20px; }
-  header h1 .gold { color: var(--gold); }
-  header .sub { font-size: 12px; opacity: .8; margin-top: 4px; }
-  .updated { font-size: 12px; color: var(--gold); margin-top: 6px; }
-  .wrap { max-width: 1200px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px; }
-  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
-  .card h2 { font-size: 15px; color: var(--navy); border-left: 4px solid var(--gold); padding-left: 8px; margin-bottom: 12px; }
-  /* 테마 TOP10 바 */
-  .bar-row { display: flex; align-items: center; margin: 5px 0; font-size: 13px; cursor: pointer; }
-  .bar-row:hover .bar-name { text-decoration: underline; }
-  .bar-name { width: 150px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .bar-track { flex: 1; background: #EDF0F4; border-radius: 4px; height: 20px; position: relative; }
-  .bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--navy-light), var(--up)); }
-  .bar-val { position: absolute; right: 6px; top: 0; line-height: 20px; font-size: 12px; font-weight: bold; }
-  .persist-tag { font-size: 11px; margin-left: 6px; }
-  .summary { font-size: 12px; color: var(--muted); margin-top: 10px; }
-  select, input[type=number] { padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; width: 100%; }
-  label { font-size: 12px; color: var(--muted); display: block; margin: 8px 0 4px; }
-  /* 대장주 카드 */
-  .leader-box { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-  .metric { background: #F4F6FA; border-radius: 8px; padding: 12px; text-align: center; }
-  .metric .k { font-size: 11px; color: var(--muted); }
-  .metric .v { font-size: 18px; font-weight: bold; color: var(--navy); margin-top: 4px; }
-  .metric .v.up { color: var(--up); }
-  .badge { display: inline-block; font-size: 12px; padding: 4px 10px; border-radius: 12px; margin-bottom: 8px; }
-  .badge.ok { background: #E8F5E9; color: #1B7A3D; }
-  .badge.warn { background: #FDF3E0; color: #A66B00; }
-  .second { font-size: 12px; color: var(--muted); margin-top: 8px; }
-  /* 종목 테이블 */
-  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
-  th { background: var(--navy); color: #fff; padding: 8px 6px; font-weight: normal; font-size: 12px; cursor: pointer; user-select: none; }
-  th:hover { background: var(--navy-light); }
-  td { padding: 7px 6px; border-bottom: 1px solid var(--border); text-align: right; }
-  td:first-child, th:first-child { text-align: left; }
-  tr:hover td { background: #F4F6FA; }
-  .rate-up { color: var(--up); font-weight: bold; }
-  .rate-down { color: var(--down); font-weight: bold; }
-  a.chart-link { color: var(--navy); text-decoration: none; font-size: 12px; }
-  a.chart-link:hover { color: var(--gold); }
-  footer { text-align: center; font-size: 11px; color: var(--muted); padding: 20px; line-height: 1.7; }
-  .loading { text-align: center; padding: 60px; color: var(--muted); }
+  body { font-family: var(--sans); background: var(--canvas); color: var(--ink);
+         font-size: 16px; line-height: 1.5; }
+
+  /* top-nav-on-dark: 64px */
+  .nav { background: var(--surface-dark); height: 64px; display: flex; align-items: center;
+         justify-content: space-between; padding: 0 32px; }
+  .nav .brand { color: var(--on-dark); font-size: 16px; font-weight: 600; letter-spacing: -0.2px; }
+  .nav .brand b { color: var(--primary); font-weight: 600; }
+  .badge { display: inline-block; background: var(--surface-strong); color: var(--ink);
+           font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: var(--r-pill); }
+
+  /* hero-band-dark: display 400 + 네거티브 트래킹 */
+  .hero { background: var(--surface-dark); color: var(--on-dark); padding: 72px 32px 80px; }
+  .hero-inner { max-width: 1200px; margin: 0 auto; }
+  .hero h1 { font-weight: 400; font-size: 64px; line-height: 1.0; letter-spacing: -1.6px; }
+  .hero p { color: var(--on-dark-soft); font-size: 16px; margin-top: 20px; max-width: 560px; }
+  .hero .pills { margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .pill-primary { background: var(--primary); color: var(--on-primary); font-size: 16px;
+                  font-weight: 600; line-height: 1.15; padding: 12px 20px; border-radius: var(--r-pill);
+                  border: none; display: inline-block; }
+  .pill-outline { background: transparent; color: var(--on-dark); font-size: 16px; font-weight: 600;
+                  line-height: 1.15; padding: 11px 19px; border-radius: var(--r-pill);
+                  border: 1px solid rgba(255,255,255,.4); display: inline-block; }
+
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 48px 32px 0;
+          display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.25fr); gap: 24px; }
+  @media (max-width: 1024px) { .wrap { grid-template-columns: minmax(0,1fr); } }
+
+  /* feature-card: 24px 라운드, 헤어라인, 32px 패딩, 단일 그림자 티어(호버) */
+  .card { background: var(--canvas); border: 1px solid var(--hairline); border-radius: var(--r-xl);
+          padding: 32px; margin-bottom: 24px; transition: box-shadow .15s; }
+  .card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); }
+  .card h2 { font-weight: 400; font-size: 32px; line-height: 1.13; letter-spacing: -0.4px; }
+  .card .sub { color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+  /* asset-row 형태의 테마 바 */
+  .bar-row { display: flex; align-items: center; gap: 12px; padding: 12px 0;
+             border-bottom: 1px solid var(--hairline-soft); cursor: pointer; }
+  .bar-row:last-child { border-bottom: none; }
+  .bar-row:hover .bar-name { color: var(--primary); }
+  .bar-name { width: 168px; flex-shrink: 0; font-size: 14px; font-weight: 600;
+              white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .15s; }
+  .bar-track { flex: 1; background: var(--surface-strong); border-radius: var(--r-pill); height: 10px; }
+  .bar-fill { height: 100%; border-radius: var(--r-pill); background: var(--primary); }
+  .bar-val { width: 84px; text-align: right; font-family: var(--mono); font-size: 14px; font-weight: 500; }
+  .summary { font-size: 13px; color: var(--muted); margin-top: 16px; }
+
+  label { font-size: 13px; color: var(--body); display: block; margin: 20px 0 8px; }
+  select, input[type=number] {
+    width: 100%; height: 48px; padding: 14px 16px; font-size: 16px; font-family: var(--sans);
+    color: var(--ink); background: var(--canvas); border: 1px solid var(--hairline);
+    border-radius: var(--r-md); outline: none; }
+  select:focus, input[type=number]:focus { border: 2px solid var(--primary); padding: 13px 15px; }
+
+  /* 대장주: pricing-tier-featured (다크 반전 = 하이라이트) + product-ui-card-dark */
+  .leader-card { background: var(--surface-dark); color: var(--on-dark); border-radius: var(--r-xl);
+                 padding: 32px; margin-bottom: 24px; }
+  .leader-card .meta { color: var(--on-dark-soft); font-size: 13px; margin-top: 8px; }
+  .metric-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-top: 24px; }
+  @media (max-width: 640px) { .metric-grid { grid-template-columns: minmax(0,1fr); } }
+  .metric { background: var(--surface-dark-elevated); border-radius: var(--r-lg); padding: 20px; }
+  .metric .k { font-size: 12px; color: var(--on-dark-soft); }
+  .metric .v { font-size: 20px; font-weight: 400; letter-spacing: -0.3px; margin-top: 8px; }
+  .metric .v.num { font-family: var(--mono); font-weight: 500; }
+  .second { font-size: 13px; color: var(--on-dark-soft); margin-top: 20px; }
+  .second b { color: var(--on-dark); font-weight: 600; }
+
+  /* asset-row 테이블: 헤어라인 구분선, 배경 없음, 숫자는 모노 */
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: right; font-size: 12px; font-weight: 600; color: var(--muted);
+       letter-spacing: 0.4px; padding: 12px 8px; border-bottom: 1px solid var(--hairline);
+       cursor: pointer; user-select: none; white-space: nowrap; }
+  th:first-child { text-align: left; }
+  th:hover { color: var(--primary); }
+  td { text-align: right; font-size: 14px; padding: 14px 8px;
+       border-bottom: 1px solid var(--hairline-soft); font-family: var(--mono); font-weight: 500; }
+  td:first-child { text-align: left; font-family: var(--sans); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  .up { color: var(--up); }
+  .down { color: var(--down); }
+  td.dim { color: var(--body); }
+  a.chart-link { color: var(--primary); text-decoration: none; font-family: var(--sans);
+                 font-size: 13px; font-weight: 600; }
+  a.chart-link:hover { color: var(--primary-active); }
+
+  footer { max-width: 1200px; margin: 24px auto 0; padding: 48px 32px 32px;
+           border-top: 1px solid var(--hairline-soft); }
+  footer .legal { color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .loading { text-align: center; padding: 96px 32px; color: var(--muted); }
+
+  @media (max-width: 1024px) { .hero h1 { font-size: 52px; letter-spacing: -1.3px; } }
+  @media (max-width: 640px) {
+    .hero { padding: 48px 20px 56px; }
+    .hero h1 { font-size: 36px; letter-spacing: -0.5px; }
+    .nav, footer { padding-left: 20px; padding-right: 20px; }
+    .wrap { padding: 32px 20px 0; }
+    .card, .leader-card { padding: 20px; }
+    .bar-name { width: 120px; }
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1>📈 실시간 주도 테마 & <span class="gold">진성 대장주</span> 내비게이션</h1>
-  <div class="sub">거래대금이 받쳐주는 진성 대장주와 테마 지속성(연속 주도 vs 신규 점화)을 함께 포착합니다</div>
-  <div class="updated" id="updated">데이터 불러오는 중...</div>
-</header>
+
+<nav class="nav">
+  <span class="brand">테마 <b>내비게이션</b></span>
+  <span class="badge" id="statusBadge">LIVE</span>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <h1>실시간 주도 테마와<br>진성 대장주를 한눈에</h1>
+    <p>거래대금이 받쳐주는 진성 대장주와 테마 지속성(연속 주도 vs 신규 점화)을 함께 포착합니다.</p>
+    <div class="pills">
+      <span class="pill-primary" id="updated">데이터 불러오는 중</span>
+      <span class="pill-outline" id="marketState">—</span>
+    </div>
+  </div>
+</section>
 
 <div class="wrap" id="app" style="display:none">
   <div>
     <div class="card">
-      <h2>🔥 오늘 최고의 주도 테마 TOP 10</h2>
-      <div id="top10"></div>
+      <h2>오늘 최고의 주도 테마</h2>
+      <div class="sub">등락률 상위 10개 · 막대 클릭 시 상세 분석</div>
+      <div id="top10" style="margin-top:20px"></div>
       <div class="summary" id="rotation"></div>
     </div>
     <div class="card">
-      <h2>테마 상세 선택</h2>
-      <label>상세 분석할 테마 (상위 <span id="topN">15</span>개 테마 제공)</label>
+      <h2 style="font-size:18px;font-weight:600;letter-spacing:0;line-height:1.33">테마 상세 선택</h2>
+      <label>상세 분석할 테마 (상위 <span id="topN">15</span>개 제공)</label>
       <select id="themeSel"></select>
       <label>진성 대장주 거래대금 기준 (억 원)</label>
       <input type="number" id="threshold" value="100" min="10" step="10">
     </div>
   </div>
   <div>
-    <div class="card">
-      <h2 id="detailTitle">🔍 테마 상세 분석</h2>
-      <div id="themeMeta" class="summary"></div>
-      <div id="leaderArea"></div>
+    <div class="leader-card">
+      <span class="badge" id="leaderBadge">진성 대장주</span>
+      <div class="meta" id="themeMeta"></div>
+      <div class="metric-grid" id="leaderMetrics"></div>
+      <div class="second" id="secondLine"></div>
     </div>
     <div class="card">
-      <h2>📊 테마 소속 종목 전체 보기 <span style="font-size:11px;color:var(--muted)">(컬럼 클릭 시 정렬)</span></h2>
+      <h2 style="font-size:18px;font-weight:600;letter-spacing:0;line-height:1.33" id="detailTitle">테마 소속 종목</h2>
+      <div class="sub">컬럼 클릭 시 정렬</div>
       <div style="overflow-x:auto"><table id="stockTable">
         <thead><tr>
           <th data-k="name">종목명</th><th data-k="price">현재가</th>
@@ -101,20 +182,29 @@
 <div class="loading" id="loading">데이터를 불러오는 중입니다...</div>
 
 <footer>
-  데이터: 네이버 증권 지연 시세 기준 · 장중 약 3분 간격 자동 갱신<br>
-  ⚠️ 본 페이지는 개인 투자 참고용 정보 제공 목적이며, 투자 권유가 아닙니다. 투자 판단의 책임은 이용자 본인에게 있습니다.
+  <div class="legal">
+    데이터: 네이버 증권 지연 시세 기준 · 장중 약 3분 간격 자동 갱신<br>
+    본 페이지는 개인 투자 참고용 정보 제공 목적이며, 투자 권유가 아닙니다. 투자 판단의 책임은 이용자 본인에게 있습니다.
+  </div>
 </footer>
 
 <script>
+const DATA_URL = 'https://raw.githubusercontent.com/jeon0jini82-ops/theme-dashboard/data/data.json';  // setup_github.py 실행 시 자동으로 GitHub 주소로 교체됨
+
 let DATA = null;
 let sortKey = 'rate', sortDesc = true;
 
 const fmt = n => n.toLocaleString('ko-KR', {maximumFractionDigits: 0});
 const fmtRate = r => (r > 0 ? '+' : '') + r.toFixed(2) + '%';
-const rateCls = r => r > 0 ? 'rate-up' : (r < 0 ? 'rate-down' : '');
-const persistIcon = p => p === '연속 주도' ? '🔥' : (p === '신규 점화' ? '⚡' : '❄️');
+const rateCls = r => r > 0 ? 'up' : (r < 0 ? 'down' : '');
+const persistLabel = p => p === '연속 주도' ? '연속 주도' : (p === '신규 점화' ? '신규 점화' : '소강');
 
-const DATA_URL = 'https://raw.githubusercontent.com/jeon0jini82-ops/theme-dashboard/data/data.json';  // setup_github.py 실행 시 자동으로 GitHub 주소로 교체됨
+function isMarketHours() {
+  const now = new Date();
+  const kst = new Date(now.toLocaleString('en-US', {timeZone: 'Asia/Seoul'}));
+  const d = kst.getDay(), mins = kst.getHours() * 60 + kst.getMinutes();
+  return d >= 1 && d <= 5 && mins >= 510 && mins <= 945;
+}
 
 async function load() {
   try {
@@ -128,29 +218,29 @@ async function load() {
 }
 
 function render() {
+  if (!DATA.themes || !DATA.themes.length) return;
   document.getElementById('loading').style.display = 'none';
   document.getElementById('app').style.display = 'grid';
-  document.getElementById('updated').textContent = '마지막 갱신: ' + DATA.updated;
+  document.getElementById('updated').textContent = '마지막 갱신 ' + DATA.updated;
   document.getElementById('topN').textContent = DATA.detail_top_n;
+  document.getElementById('marketState').textContent = isMarketHours() ? '장중 · 3분 갱신' : '장 마감 데이터';
+  document.getElementById('statusBadge').textContent = isMarketHours() ? 'LIVE · 3분 갱신' : '장 마감';
 
-  // TOP10 바 차트
   const top10 = DATA.themes.slice(0, 10);
   const maxRate = Math.max(...top10.map(t => t.rate), 0.01);
   document.getElementById('top10').innerHTML = top10.map(t =>
     `<div class="bar-row" onclick="selectTheme('${t.id}')">
-      <div class="bar-name">${persistIcon(t.persist)} ${t.name}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(t.rate / maxRate * 100, 3)}%"></div>
-        <span class="bar-val">${fmtRate(t.rate)}</span></div>
+      <span class="bar-name">${t.name}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(t.rate / maxRate * 100, 3)}%"></div></div>
+      <span class="bar-val ${rateCls(t.rate)}">${fmtRate(t.rate)}</span>
     </div>`).join('');
 
-  // 로테이션 요약
   const cont = DATA.themes.filter(t => t.persist === '연속 주도').length;
   const fresh = DATA.themes.filter(t => t.persist === '신규 점화').length;
   document.getElementById('rotation').textContent =
-    `🔥 연속 주도 ${cont}개 · ⚡ 신규 점화 ${fresh}개 ` +
-    (cont >= fresh ? '→ 주도 테마 유지 국면' : '→ 로테이션 빠른 국면 (짧은 호흡 대응)');
+    `연속 주도 ${cont}개 · 신규 점화 ${fresh}개 ` +
+    (cont >= fresh ? '— 주도 테마 유지 국면' : '— 로테이션 빠른 국면 (짧은 호흡 대응)');
 
-  // 테마 선택 드롭다운 (상세 데이터 있는 테마만)
   const sel = document.getElementById('themeSel');
   const withDetail = DATA.themes.filter(t => DATA.details[t.id] && DATA.details[t.id].length);
   sel.innerHTML = withDetail.map(t =>
@@ -171,11 +261,10 @@ function renderDetail() {
   const stocks = (DATA.details[id] || []).slice();
   if (!theme || !stocks.length) return;
 
-  document.getElementById('detailTitle').textContent = `🔍 '${theme.name}' 상세 분석`;
+  document.getElementById('detailTitle').textContent = `'${theme.name}' 소속 종목`;
   document.getElementById('themeMeta').textContent =
-    `테마 등락률 ${fmtRate(theme.rate)} · 3일 평균 ${fmtRate(theme.avg3)} · ${persistIcon(theme.persist)} ${theme.persist}`;
+    `${theme.name} · 테마 등락률 ${fmtRate(theme.rate)} · 3일 평균 ${fmtRate(theme.avg3)} · ${persistLabel(theme.persist)}`;
 
-  // 대장주 선정 (거래대금 기준: 억 → 백만 환산)
   const thB = parseFloat(document.getElementById('threshold').value) || 100;
   const thM = thB * 100;
   let pool = stocks.filter(s => s.amt >= thM);
@@ -184,19 +273,20 @@ function renderDetail() {
   const ranked = pool.slice().sort((a, b) => b.rate - a.rate);
   const L = ranked[0];
 
-  let html = fallback
-    ? `<div class="badge warn">⚠️ 거래대금 ${thB}억 이상 종목 없음 → 등락률 1위 표시 (신뢰도 낮음)</div>`
-    : `<div class="badge ok">✅ 거래대금 ${thB}억 이상 충족 — 수급이 확인된 대장주</div>`;
-  html += `<div class="leader-box">
-    <div class="metric"><div class="k">👑 대장 종목</div><div class="v">${L.name}</div></div>
-    <div class="metric"><div class="k">등락률</div><div class="v ${L.rate>0?'up':''}">${fmtRate(L.rate)}</div></div>
-    <div class="metric"><div class="k">거래대금</div><div class="v">${fmt(L.amt/100)} 억</div></div>
-  </div>`;
+  document.getElementById('leaderBadge').textContent = fallback
+    ? `거래대금 ${thB}억 미충족 — 등락률 1위 표시` : `진성 대장주 · 거래대금 ${thB}억 이상 충족`;
+
+  document.getElementById('leaderMetrics').innerHTML = `
+    <div class="metric"><div class="k">대장 종목</div><div class="v">${L.name}</div></div>
+    <div class="metric"><div class="k">등락률</div><div class="v num ${rateCls(L.rate)}">${fmtRate(L.rate)}</div></div>
+    <div class="metric"><div class="k">거래대금</div><div class="v num">${fmt(L.amt/100)}억</div></div>`;
+
+  const secondEl = document.getElementById('secondLine');
   if (ranked.length >= 2) {
     const S = ranked[1];
-    html += `<div class="second">🥈 2등주: <b>${S.name}</b> (${fmtRate(S.rate)} / ${fmt(S.amt/100)}억) — 대장주와 격차 ${(L.rate-S.rate).toFixed(2)}%p</div>`;
-  }
-  document.getElementById('leaderArea').innerHTML = html;
+    secondEl.innerHTML = `2등주 <b>${S.name}</b> ${fmtRate(S.rate)} · ${fmt(S.amt/100)}억 — 대장주와 격차 ${(L.rate-S.rate).toFixed(2)}%p`;
+  } else { secondEl.textContent = ''; }
+
   renderTable(stocks);
 }
 
@@ -205,11 +295,11 @@ function renderTable(stocks) {
     ? (typeof b[sortKey] === 'string' ? b[sortKey].localeCompare(a[sortKey]) : b[sortKey] - a[sortKey])
     : (typeof a[sortKey] === 'string' ? a[sortKey].localeCompare(b[sortKey]) : a[sortKey] - b[sortKey]));
   document.querySelector('#stockTable tbody').innerHTML = stocks.map(s =>
-    `<tr><td>${s.name}</td><td>${fmt(s.price)}원</td>
+    `<tr><td>${s.name}</td><td>${fmt(s.price)}</td>
      <td class="${rateCls(s.rate)}">${fmtRate(s.rate)}</td>
-     <td>${fmt(s.vol)}</td><td>${fmt(s.amt/100)}</td>
+     <td class="dim">${fmt(s.vol)}</td><td class="dim">${fmt(s.amt/100)}</td>
      <td><a class="chart-link" target="_blank" rel="noopener"
-        href="https://finance.naver.com/item/fchart.naver?code=${s.code}">📈 보기</a></td></tr>`).join('');
+        href="https://finance.naver.com/item/fchart.naver?code=${s.code}">보기</a></td></tr>`).join('');
 }
 
 document.querySelectorAll('#stockTable th[data-k]').forEach(th => {
@@ -222,7 +312,7 @@ document.querySelectorAll('#stockTable th[data-k]').forEach(th => {
 });
 
 load();
-setInterval(load, 60_000);  // 1분마다 최신 data.json 확인
+setInterval(load, 60_000);
 </script>
 </body>
 </html>
